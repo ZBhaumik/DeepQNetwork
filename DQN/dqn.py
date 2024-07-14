@@ -38,11 +38,9 @@ class DQN:
 
     def update(self, batch, weights=None):
         states, actions, rewards, next_states, dones = batch
-
-        Q_s_1 = self.target_model(next_states).detach().max(1).values() # Compute the target network Q-function on s_{t+1}
+        Q_s_1 = self.target_model(next_states).max(1)[0] # Compute the target network Q-function on s_{t+1}
         Q_target = rewards + (self.gamma * Q_s_1 * (1 - dones)) # Add the reward, to create the target
-        Q_expected = self.model(states).gather(1, actions)
-
+        Q_expected = self.model(states).gather(1, actions.unsqueeze(1)).squeeze(1)
         loss = nn.functional.mse_loss(Q_expected, Q_target)
 
         self.optimizer.zero_grad()

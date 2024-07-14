@@ -30,13 +30,13 @@ state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
 
 # Initialize replay buffer and DQN agent
-replay_buffer = ReplayBuffer(state_size, action_size, BUFFER_SIZE)
+replay_buffer = ReplayBuffer(BUFFER_SIZE)
 agent = DQN(state_size, action_size, GAMMA, TAU, LR)
 
 # Training loop
 epsilon = EPSILON_START
 for episode in range(1, NUM_EPISODES + 1):
-    state = env.reset()
+    state = env.reset()[0]
     total_reward = 0
 
     while True:
@@ -75,7 +75,7 @@ torch.save(agent.model.state_dict(), 'dqn_model.pth')
 def test_agent(agent, env, episodes=10):
     total_rewards = []
     for _ in range(episodes):
-        state = env.reset()
+        state = env.reset()[0]
         episode_reward = 0
         done = False
         while not done:
