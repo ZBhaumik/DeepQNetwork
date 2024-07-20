@@ -7,18 +7,17 @@ import numpy as np
 class DQN:
     def __init__(self, state_size, action_size, gamma, tau, lr):
         self.model = nn.Sequential(
-            nn.Linear(state_size, 32),
+            nn.Linear(state_size, 64),
             nn.ReLU(),
-            nn.Linear(32, 32),
+            nn.Linear(64, 64),
             nn.ReLU(),
-            nn.Linear(32, action_size)
+            nn.Linear(64, action_size)
         ).to(self.get_device())
         
-        self.target_model = deepcopy(self.model).to(self.get_device())
+        self.target_model = deepcopy(self.model).to(self.get_device()) # Copy initial weights to target model.
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.state_size = state_size
         self.action_size = action_size
-
         self.gamma = gamma
         self.tau = tau
 
@@ -43,6 +42,7 @@ class DQN:
         Q_expected = self.model(states).gather(1, actions.unsqueeze(1)).squeeze(1)
         loss = nn.functional.mse_loss(Q_expected, Q_target)
 
+        # Update model
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
